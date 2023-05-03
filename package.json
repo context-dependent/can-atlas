@@ -9,6 +9,9 @@
   "scripts": {
     "prepublishOnly": "bash prepublish"
   },
+  "files": [
+    "*-t.json"
+  ],
   "keywords": [
     "topojson",
     "canada",

@@ -4,21 +4,20 @@ rm -rvf *-t.json
 mkdir -p build
 
 ROOTURL=https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/files-fichiers/
-CSD='lcd_000b21a_e'
+CD='lcd_000b21a_e'
 
 
-if [ ! -f build/$CSD.shp ]; then
-  curl -o build/$CSD.zip $ROOTURL$CSD.zip
-  unzip -od build build/$CSD.zip $CSD.shp $CSD.dbf
-  chmod a-x build/$CSD.*
+if [ ! -f build/$CD.shp ]; then
+  curl -o build/$CD.zip $ROOTURL$CD.zip
+  unzip build/$CD.zip -d build
+  chmod a-x build/$CD.*
 fi
 
-geo2topo -q 1e5 -n counties=<( \
-  shp2json --encoding utf-8 -n build/cb_2017_us_county_5m.shp \
-    | ndjson-filter '!/000$/.test(d.properties.GEOID)' \
-    | ndjson-map '(d.id = d.properties.GEOID, delete d.properties, d)') \
-  | toposimplify -f -s 1e-7 \
-  | topomerge states=counties -k 'd.id.slice(0, 2)' \
-  | topomerge nation=states \
-  | node ./properties.js \
-  > counties-10m.json
+geo2topo -q 1e5 -n cds=<( \
+  shp2json --encoding utf-8 -n build/$CD.shp \
+    | ndjson-filter '(d.properties.PRUID == "10")' \
+    | ndjson-map '(d.prid = d.properties.PRUID, d)' \
+    | ndjson-map '(d.cdid = d.properties.CDUID, delete d.properties, d)') \
+  | toposimplify -f -s 1 \
+  | topomerge prs=cds -k 'd.prid' \
+  > cd-t.json
