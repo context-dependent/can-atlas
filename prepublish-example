@@ -1,16 +1,12 @@
 #!/bin/bash
 
-rm -rvf *-t.json
+rm -rvf *-10m.json
 mkdir -p build
 
-ROOTURL=https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/files-fichiers/
-CSD='lcd_000b21a_e'
-
-
-if [ ! -f build/$CSD.shp ]; then
-  curl -o build/$CSD.zip $ROOTURL$CSD.zip
-  unzip -od build build/$CSD.zip $CSD.shp $CSD.dbf
-  chmod a-x build/$CSD.*
+if [ ! -f build/cb_2017_us_county_5m.shp ]; then
+  curl -o build/cb_2017_us_county_5m.zip 'https://www2.census.gov/geo/tiger/GENZ2017/shp/cb_2017_us_county_5m.zip'
+  unzip -od build build/cb_2017_us_county_5m.zip cb_2017_us_county_5m.shp cb_2017_us_county_5m.dbf
+  chmod a-x build/cb_2017_us_county_5m.*
 fi
 
 geo2topo -q 1e5 -n counties=<( \
