@@ -1,0 +1,19 @@
+{
+  "name": "@tkm/can-atlas",
+  "version": "1.0.0",
+  "description": "Redistribution of Canadian statistical boundaries as TopoJSON",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "topojson",
+    "canada",
+    "census",
+    "geojson",
+    "boundary",
+    "shapefile"
+  ],
+  "author": "Thomas McManus",
+  "license": "ISC"
+}
