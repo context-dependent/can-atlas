@@ -1,6 +1,6 @@
 {
-  "name": "@tkm/can-atlas",
-  "version": "1.0.0",
+  "name": "can-atlas",
+  "version": "1.0.1",
   "description": "Redistribution of Canadian statistical boundaries as TopoJSON",
   "main": "index.js",
   "publishConfig": {
