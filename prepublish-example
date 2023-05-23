@@ -1,20 +1,31 @@
 #!/bin/bash
 
+# remove prior builds of topo file
 rm -rvf *-10m.json
+# create build directory if necessary
 mkdir -p build
 
+# if there's no shapefile, download it, unpack it, and set exec permissions on its contents
 if [ ! -f build/cb_2017_us_county_5m.shp ]; then
   curl -o build/cb_2017_us_county_5m.zip 'https://www2.census.gov/geo/tiger/GENZ2017/shp/cb_2017_us_county_5m.zip'
   unzip -od build build/cb_2017_us_county_5m.zip cb_2017_us_county_5m.shp cb_2017_us_county_5m.dbf
   chmod a-x build/cb_2017_us_county_5m.*
 fi
 
+# (a) convert shapefile to geojson
+#   -n output newline-delimited json (why?) 
+# (b) create a topology of counties
+#   -q apply quantization of 1e5 (this appears to permit a degree of irregularity / misalignment of arcs)
 geo2topo -q 1e5 -n counties=<( \
-  shp2json --encoding utf-8 -n build/cb_2017_us_county_5m.shp \
-    | ndjson-filter '!/000$/.test(d.properties.GEOID)' \
-    | ndjson-map '(d.id = d.properties.GEOID, delete d.properties, d)') \
+  shp2json --encoding utf-8 -n build/cb_2017_us_county_5m.shp \            # (a)
+    | ndjson-filter '!/000$/.test(d.properties.GEOID)' \                   # then, filter out counties with identifiers ending in '000'
+    | ndjson-map '(d.id = d.properties.GEOID, delete d.properties, d)') \  # then, for each county, set its id to its previous .properties.GEOID, delete properties
+  # simplify geometries (compress by eliminating redundant arcs, basically)
   | toposimplify -f -s 1e-7 \
+  # merge counties into states per the first two values of their id
   | topomerge states=counties -k 'd.id.slice(0, 2)' \
+  # merge all states into the nation (us)
   | topomerge nation=states \
+  # send the output to properties.js
   | node ./properties.js \
   > counties-10m.json

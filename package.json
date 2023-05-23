@@ -7,7 +7,8 @@
     "access": "public"
   },
   "scripts": {
-    "prepublishOnly": "bash prepublish"
+    "prepublishOnly": "bash prepublish-er",
+    "junk": "bash junk"
   },
   "files": [
     "*-t.json"
@@ -25,7 +26,9 @@
   "devDependencies": {
     "d3-dsv": "^3.0.1",
     "d3-geo-projection": "^4.0.0",
+    "epsg": "^0.5.0",
     "ndjson-cli": "^0.3.1",
+    "reproject": "^1.2.7",
     "shapefile": "^0.6.6",
     "topojson-client": "^3.1.0",
     "topojson-server": "^3.0.1",

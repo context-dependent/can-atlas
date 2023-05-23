@@ -2,7 +2,6 @@ const shapefile = require("shapefile");
 
 Promise.all([
   parseInput(),
-  shapefile.read("build/lcd_000b21a_e.shp", undefined, { encoding: "utf-8" }),
   shapefile.read("build/lcd_000b21a_e.shp", undefined, { encoding: "utf-8" })
 ]).then(output);
 
