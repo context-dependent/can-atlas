@@ -8,7 +8,9 @@
   },
   "scripts": {
     "prepublishOnly": "bash prepublish-er",
-    "junk": "bash junk"
+    "pr-digital-topo": "bash pr-digital-topo",
+    "pr-cartographic-topo": "bash pr-cartographic-topo",
+    "unproject": "bash unproject"
   },
   "files": [
     "*-t.json"

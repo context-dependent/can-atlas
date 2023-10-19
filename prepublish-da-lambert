@@ -1,0 +1,34 @@
+#!/bin/bash
+
+rm -rvf *-topo.json build/*.json
+mkdir -p build
+
+ROOTURL=https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/files-fichiers/
+F=lda_000a21a_e
+
+if [ ! -f build/$F.shp ]; then
+  curl -o build/$F.zip $ROOTURL$F.zip
+  unzip build/$F.zip -d build
+  chmod a-x build/$F.*
+fi
+
+# CD='cd_nad83'
+# if [ ! -f build/$CD.shp ]; then
+#   curl -o build/$CD.zip $ROOTURL$CD.zip
+#   unzip build/$CD.zip -d build
+#   chmod a-x build/$CD.*
+# fi
+
+echo 'converting shp to ndjson'
+shp2json --encoding utf-8 --crs-name 'EPSG:3347' -n build/$F.shp \
+    | ndjson-map '(d.id = d.properties.DAUID, delete d.properties, d)' \
+    > build/$F-geo.json
+
+
+echo 'converting geojson to topojson'
+geo2topo -q 1e6 -n dissemination_areas=build/$F-geo.json \
+  | toposimplify -f -s 1e-9 \
+  | topomerge census_divisions=dissemination_areas -k 'd.id.slice(0, 4)' \
+  | topomerge provinces=census_divisions -k 'd.id.slice(0, 2)' \
+  | topomerge canada=provinces \
+  > build/$F-topo.json

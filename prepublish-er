@@ -4,7 +4,7 @@ rm -rvf *-topo.json build/*.json
 mkdir -p build
 
 ROOTURL=https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/files-fichiers/
-F=ler_000b21a_e
+F=ler_000a21a_e
 
 if [ ! -f build/$F.shp ]; then
   curl -o build/$F.zip $ROOTURL$F.zip
@@ -23,12 +23,14 @@ echo 'transforming coords to EPSG 4326'
 ogr2ogr build/$F-4326.shp -t_srs 'EPSG:4326' build/$F.shp
 
 echo 'converting shp to ndjson'
-shp2json --encoding utf-8 -n build/$F-4326.shp \
-    | ndjson-map '(d.prid = d.properties.PRUID, d)' \
+shp2json --encoding utf-8 --crs-name 'EPSG:4326' -n build/$F-4326.shp \
+    | ndjson-map '(d.id = d.properties.ERUID, delete d.properties, d)' \
     > build/$F-geo.json
 
+
 echo 'converting geojson to topojson'
-geo2topo -q 1e5 -n prs=build/$F-geo.json \
+geo2topo -q 1e5 -n economic_regions=build/$F-geo.json \
   | toposimplify -f -s 1e-7 \
-  | topomerge nation=prs \
+  | topomerge provinces=economic_regions -k 'd.id.slice(0, 2)' \
+  | topomerge nation=provinces \
   > build/$F-topo.json

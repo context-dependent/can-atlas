@@ -1,0 +1,15 @@
+#!/bin/bash
+
+rm -rvf build/lines-out* build/pr-geo-4326.json
+touch build/lines-out.txt build/pr-geo-4326.json
+
+while IFS="" read -r line || [ -n "$line" ]
+do 
+    echo "$line" >> build/lines-out.txt
+done < build/lines.txt
+
+while IFS="" read -r f || [ -n "$f" ]
+do
+    echo $f | reproject --use-epsg-io --from=EPSG:3347 --to=EPSG:4326 >> build/pr-geo-4326.json
+    echo >> build/pr-geo-4326.json
+done < build/pr-geo.json
