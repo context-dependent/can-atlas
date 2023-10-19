@@ -1,16 +1,13 @@
 {
   "name": "can-atlas",
   "version": "1.0.1",
-  "description": "Redistribution of Canadian statistical boundaries as TopoJSON",
+  "description": "Redistribution of Canadian statistical boundaries (DA > CD > PR) as TopoJSON mesh",
   "main": "index.js",
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "prepublishOnly": "bash prepublish-er",
-    "pr-digital-topo": "bash pr-digital-topo",
-    "pr-cartographic-topo": "bash pr-cartographic-topo",
-    "unproject": "bash unproject"
+    "prepublishOnly": "bash prepublish-da-lambert"
   },
   "files": [
     "*-t.json"
@@ -26,6 +23,7 @@
   "author": "Thomas McManus",
   "license": "ISC",
   "devDependencies": {
+    "csv2json": "^2.0.2",
     "d3-dsv": "^3.0.1",
     "d3-geo-projection": "^4.0.0",
     "epsg": "^0.5.0",

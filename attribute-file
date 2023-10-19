@@ -1,0 +1,16 @@
+#!/bin/bash
+
+rm -rvf build/*.json
+
+URL=https://www12.statcan.gc.ca/census-recensement/2021/geo/aip-pia/attribute-attribs/files-fichiers/2021_92-151_X.zip
+F="2021_92-151_X"
+
+if [ ! -f build/$F.zip ]; then
+    curl -o build/$F.zip $URL
+    unzip build/$F.zip -d build
+    chmod a-x build/$F.*
+fi
+
+csv2json build/$F.csv \
+    | ndjson-map '(x = {}, x.da_uid = d.DAUID_ADIDU, d = x, d)' \
+    > build/$F.json
